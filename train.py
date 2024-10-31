@@ -9,15 +9,13 @@ def read_pandas_from_csv(csv_file):
     df = pd.read_csv(csv_file)
     return df
 
-#print(read_pandas_from_csv("trainData.csv"))
-
-#SHOWN TO USER
 def train(csv_fn, model_fn):
     df = pd.read_csv(csv_fn)
     #print all column names (without any being skipped)
     features = ['rainfall', 'mean_temperature']
     X = df[features] #What if we wanted last months disease cases - how to easily get lagged data
     Y = df['disease_cases']
+    Y = Y.fillna(0)  # set NaNs to zero (not a good solution, just for the example to work)
     model = LinearRegression()
     model.fit(X, Y)
     joblib.dump(model, model_fn)

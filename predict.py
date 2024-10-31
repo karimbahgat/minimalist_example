@@ -9,7 +9,7 @@ def predict(model_fn, historic_data_fn, future_climatedata_fn, predictions_fn):
     model = joblib.load(model_fn)
 
     y_pred = model.predict(X)
-    df['disease_cases'] = y_pred
+    df['sample_0'] = y_pred
     df.to_csv(predictions_fn, index=False)
     print("predict - forecast values: ", y_pred)
 
