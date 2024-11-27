@@ -5,10 +5,6 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 
 
-def read_pandas_from_csv(csv_file):
-    df = pd.read_csv(csv_file)
-    return df
-
 def train(csv_fn, model_fn):
     df = pd.read_csv(csv_fn)
     #print all column names (without any being skipped)
