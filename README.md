@@ -17,7 +17,7 @@ train("input/trainData.csv", "output/model.bin")
 
 * A call to a function "predict" uses the stored model to forecast future disease cases (to a file "predictions.csv") based on input data on future climate predictions (from a file futureClimateData.csv):
 ```python
-predict("output/model.bin", "input/futureClimateData.csv", "output/predictions.csv")
+predict("output/model.bin", "input/trainData.csv", "input/futureClimateData.csv", "output/predictions.csv")
 ```
 
 
@@ -34,10 +34,10 @@ The file "train.py" contains the code to train a model. It reads in training dat
 ```
 def train(csv_fn, model_fn):
     df = pd.read_csv(csv_fn)
-    #print all column names (without any being skipped)
     features = ['rainfall', 'mean_temperature']
-    X = df[features] #What if we wanted last months disease cases - how to easily get lagged data
+    X = df[features]
     Y = df['disease_cases']
+    Y = Y.fillna(0)  # set NaNs to zero (not a good solution, just a simplest possible solution for the example to work)
     model = LinearRegression()
     model.fit(X, Y)
     joblib.dump(model, model_fn)
@@ -55,15 +55,15 @@ time_period,rainfall,mean_temperature,location
 ### Generating forecasts
 The file "predict.py" contains the code to forecast disease cases ahead in time based on future climate data (weather forecasts) and a previously trained model read from file. The disease forecasts are stored as a column in a csv file predictions_fn:
 ```
-def predict(model_fn, future_climatedata_fn, predictions_fn):
+def predict(model_fn, historic_data_fn, future_climatedata_fn, predictions_fn):
     df = pd.read_csv(future_climatedata_fn)
     X = df[['rainfall', 'mean_temperature']]
     model = joblib.load(model_fn)
 
     y_pred = model.predict(X)
-    df['disease_cases'] = y_pred
+    df['sample_0'] = y_pred
     df.to_csv(predictions_fn, index=False)
-    print("predict - forecast values: ", y_pred)
+    return y_pred
 ```
 
 ## Running the minimalist model as part of CHAP
@@ -71,12 +71,6 @@ To run the minimalist model in CHAP, we first define the model interface in an M
 
 ```yaml
 name: min_py_ex
-
-adapters: {'disease_cases': 'disease_cases',
-           'location': 'location',
-           'time_period': 'time_period'
-           'rainfall': 'rainfall',
-           'mean_temperature': 'mean_temperature'}
 
 entry_points:
   train:
@@ -92,7 +86,10 @@ entry_points:
       out_file: path
     command: "python predict.py {model} {historic_data} {future_data} {out_file}"
 
+
 ```
 
-(this is in the process of being finalised..)
-
+After you have installed chap-core (see here for installation instructions: https://github.com/dhis2-chap/chap-core), you can run this minimalist model through CHAP as follows (remember to replace '/path/to/your/model/directory' with your local path):
+```
+chap evaluate --model-name /path/to/your/model/directory --dataset-name ISIMIP_dengue_harmonized --dataset-country brazil --report-filename report.pdf --ignore-environment  --debug
+```

@@ -7,9 +7,8 @@ from sklearn.linear_model import LinearRegression
 
 def train(csv_fn, model_fn):
     df = pd.read_csv(csv_fn)
-    #print all column names (without any being skipped)
     features = ['rainfall', 'mean_temperature']
-    X = df[features] #What if we wanted last months disease cases - how to easily get lagged data
+    X = df[features]
     Y = df['disease_cases']
     Y = Y.fillna(0)  # set NaNs to zero (not a good solution, just for the example to work)
     model = LinearRegression()
