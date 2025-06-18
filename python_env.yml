@@ -1,0 +1,13 @@
+# Python version required to run the project.
+python: "3.11.3"
+# Dependencies required to build packages. This field is optional.
+build_dependencies:
+  - pip
+  - setuptools
+  - wheel==0.37.1
+# Dependencies required to run the project.
+dependencies:
+  - scikit-learn==1.6.1
+  - joblib==1.4.2
+  - chap_core @ git+https://github.com/dhis2/chap-core.git
+  - pandas
